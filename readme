@@ -1,0 +1,10 @@
+EJECUTAR BOT
+    cd ~/proyectos/topic_modeling_articulos_web/bot_telegram
+    python bot_telegram.py
+
+EJECUTAR MODELO EN DOCKER
+    docker build -t topic_modeling_model .
+    docker run --rm -it -p 55555:8080 --name model topic_modeling_model
+    test
+        python colsole ->
+        import requests ; res = requests.post('http://0.0.0.0:55555/topic-modeling/get', json = {'texto_completo':"""Understanding of natural language processing"""}) ;

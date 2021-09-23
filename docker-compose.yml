@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  modelo:
+    container_name: modelo
+    build:
+      context: modelo
+      dockerfile: Dockerfile
+    command: ["python", "start.py"]
+    ports:
+      - "55555:8080"
+    networks:
+      - cwtm-net
+
+  clasificador:
+    container_name: clasificador
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "./main.py"]
+    depends_on:
+      - modelo
+    networks:
+      - cwtm-net
+
+networks:
+  cwtm-net:
