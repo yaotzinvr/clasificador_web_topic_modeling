@@ -1,6 +1,6 @@
 EJECUTAR BOT
-    cd ~/proyectos/topic_modeling_articulos_web/bot_telegram
-    python bot_telegram.py
+    cd ~/proyectos/topic_modeling_articulos_web/chatbot
+    python telegram.py
 
 EJECUTAR MODELO EN DOCKER
     docker build -t topic_modeling_model .
