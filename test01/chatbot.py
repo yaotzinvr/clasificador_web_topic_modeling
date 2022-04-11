@@ -1,6 +1,6 @@
 import re
 import telebot
-import service
+import servicio
 import logging
 from config import BOT_TELEGRAM_URI
 
@@ -19,7 +19,7 @@ def command(message):
 	d =  {'comando': texto[0].replace('/', ''), 'args': [x for x in texto[1:] if len(x) > 0] if len(texto) > 1 else None}
 	print('INPUT:',d)
 	if d['comando']=='info':
-		bot.reply_to(message, comm_info(d['args']))
+		bot.reply_to(message, info(d['args']))
 	elif d['comando']=='add':
 		bot.reply_to(message, add(d['args']))
 	elif d['comando']=='rm':
@@ -30,10 +30,10 @@ def command(message):
 		bot.reply_to(message, top(d['args']))
 	elif d['comando'] == 'tail':
 		bot.reply_to(message, tail(d['args']))
-	else: bot.reply_to(message, comm_info())
+	else: bot.reply_to(message, info())
 
 
-def comm_info(args=None):
+def info(args=None):
 	comando = args[0] if args else None
 	if comando=='add':
 		return "/add" \
@@ -71,38 +71,38 @@ def add(args):
 	res = re.search('https?.+$', args[0]) if args else None
 	if not res: return 'Lo siento no reconocí una URL válida'
 	url = res[0]
-	res = service.service_add(url)
+	res = servicio.servicio_add(url)
 	if not res['ok']: return ERROR_MSJ+'\n'+res['msj']
 	return res['msj']
 
 def rm(args):
 	if not args: return 'Argumento requerido'
-	res = service.service_rm(args[0])
+	res = servicio.servicio_rm(args[0])
 	if not res['ok']: return ERROR_MSJ + '\n' + res['msj']
 	return res['msj']
 
 def get(args):
 	if not args: return 'Argumento requerido'
-	res = service.service_get(args[0].split(','))
+	res = servicio.servicio_get(args[0].split(','))
 	print(res)
 	if not res['ok']: return ERROR_MSJ + '\n' + res['msj']
 	return res['msj']
 
 def top(args):
 	parametro = args[0] if args else '10'
-	parametro = service.try_generic(int, parametro) if parametro else None
+	parametro = servicio.try_generic(int, parametro) if parametro else None
 	if parametro == None or (parametro != None and parametro < 0): return 'Argumento inválido'
 	parametro = parametro if parametro > 0 else 10
-	res = service.service_top(parametro)
+	res = servicio.servicio_top(parametro)
 	if not res['ok']: return ERROR_MSJ + '\n' + res['msj']
 	return res['msj']
 
 def tail(args):
 	parametro = args[0] if args else '10'
-	parametro = service.try_generic(int, parametro) if parametro else None
+	parametro = servicio.try_generic(int, parametro) if parametro else None
 	if parametro == None or (parametro != None and parametro < 0): return 'Argumento inválido'
 	parametro = parametro if parametro > 0 else 10
-	res = service.service_top(parametro,False)
+	res = servicio.servicio_top(parametro,False)
 	if not res['ok']: return ERROR_MSJ + '\n' + res['msj']
 	return res['msj']
 

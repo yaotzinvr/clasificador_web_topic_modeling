@@ -6,37 +6,28 @@ stop_words += ['lack', 'make', 'want', 'seem', 'run', 'need', 'even', 'right','u
 stop_words += []
 
 
-def limpia_signos(texto):
-    texts = texto.split('.')
-    return [re.sub('[\.,\\\/#¡!¿?$%\^&\*;:{}\[\]=\'+\-_`~()”“"…<>]', ' ', t).lower().replace('  ',' ') for t in texts]
-
-def limpia_stopwords(texts):
-    return [[word for word in gensim.utils.simple_preprocess(str(doc)) if word not in stop_words] for doc in texts]
-
-def get_data_words(corpus):
-    res = [gensim.utils.simple_preprocess(t, deacc=True) for t in corpus]
-    return res
-
-def modelo_lda(data_words):
+def get_data_words(texto):
     try:
-        id2word = gensim.corpora.Dictionary(data_words)
-        texts = data_words
-        corpus = [id2word.doc2bow(text) for text in texts]
-        Lda = gensim.models.ldamodel.LdaModel
-        return Lda(corpus, id2word=id2word, num_topics=1)
+        # Limpia texto de signos
+        texts = texto.split('.')
+        corpus = [re.sub('[\.,\\\/#¡!¿?$%\^&\*;:{}\[\]=\'+\-_`~()”“"…<>]', ' ', t).lower().replace('  ', ' ') for t in texts]
+        # Genera estructura de palabras
+        data_words = [gensim.utils.simple_preprocess(t, deacc=True) for t in corpus]
+        # Elimina stopwords
+        data_words_clean = [[word for word in gensim.utils.simple_preprocess(str(doc)) if word not in stop_words] for doc in data_words]
     except Exception as e:
-        raise Exception('(modelo_lda)' + str(e))
+        raise Exception('(get_data_words)' + str(e))
+    return data_words_clean
+
 
 def get_model(texto_completo):
     try:
-        #Limpia texto de signos
-        corpus = limpia_signos(texto_completo)
-        # Genera estructura de palabras
-        data_words = get_data_words(corpus)
-        # Elimina stopwords
-        data_words = limpia_stopwords(data_words)
+        #Genera corpus
+        data_words = get_data_words(texto_completo)
         #Genera modelo LDA
-        lda = modelo_lda(data_words)
+        id2word = gensim.corpora.Dictionary(data_words)
+        corpus = [id2word.doc2bow(text) for text in data_words]
+        lda = gensim.models.ldamodel.LdaModel(corpus, id2word=id2word, num_topics=1)
     except Exception as e:
         raise Exception('(get_model)' + str(e))
     return {x.split('*')[1]:float(x.split('*')[0]) for x in lda.print_topic(0).replace('"','').replace(' ','').split('+')[:10]}

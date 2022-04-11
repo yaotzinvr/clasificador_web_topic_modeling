@@ -10,13 +10,14 @@ def get_client():
     return c
 
 
-def get(filtros, lista_variables=None):
+def get(filtros, atributos=None):
     client = None
     try:
         client = get_client()
+        print(client[BD][COLLECTION].find())
         if filtros:
             if '_id' in filtros: filtros['_id'] = bson.objectid.ObjectId(filtros['_id'])
-        res = client[BD][COLLECTION].find(filtros,lista_variables)
+        res = client[BD][COLLECTION].find(filtros,atributos)
         l=[]
         for r in res: l.append(r)
     except Exception as e:
@@ -24,7 +25,6 @@ def get(filtros, lista_variables=None):
     finally:
         if client: client.close()
     return l
-
 
 def save(document):
     client = None
@@ -85,4 +85,6 @@ def delete_many_by_ids(ids):
         if client: client.close()
     return res.deleted_count
 
-if __name__=='__main__': delete('6236da13c87f5e6139a82c90')
+if __name__=='__main__':
+    #delete('6236da13c87f5e6139a82c90')
+    print(get_client().server_info())

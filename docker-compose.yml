@@ -1,27 +1,50 @@
 version: "3"
 
 services:
-  modelo:
-    container_name: modelo
-    build:
-      context: modelo
-      dockerfile: Dockerfile
-    command: ["python", "start.py"]
-    ports:
-      - "55555:8080"
-    networks:
-      - cwtm-net
-
-  clasificador:
-    container_name: clasificador
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["python", "./main.py"]
+  chrome:
+    image: selenium/node-chrome:4.1.2-20220217
+    shm_size: 2gb
     depends_on:
-      - modelo
-    networks:
-      - cwtm-net
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+  selenium-hub:
+    image: selenium/hub:4.1.2-20220217
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+  #webscraping:
+  #  container_name: webscraping
+  #  build:
+  #    context: webscraping
+  #    dockerfile: Dockerfile
+  #  command:
 
-networks:
-  cwtm-net:
+#  modelo:
+#    container_name: modelo
+#    build:
+#      context: modelo
+#      dockerfile: Dockerfile
+#    command: ["python", "start.py"]
+#    ports:
+#      - "55555:8080"
+#    networks:
+#      - cwtm-net
+
+#  clasificador:
+#    container_name: clasificador
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    command: ["python", "./main.py"]
+#    depends_on:
+#      - modelo
+#    networks:
+#      - cwtm-net
+
+#networks:
+#  cwtm-net:

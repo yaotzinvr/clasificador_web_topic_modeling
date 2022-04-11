@@ -1,0 +1,5 @@
+pyTelegramBotAPI
+pymongo[srv]
+selenium
+webdriver_manager
+gensim

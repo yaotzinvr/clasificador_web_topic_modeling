@@ -1,4 +1,4 @@
-import dao
+import database
 import model
 import webscraping
 import functools
@@ -6,7 +6,7 @@ import functools
 
 def get_articulo_by_url(url):
     try:
-        res = dao.get({'url':url},lista_variables=['_id','url','titulo','lda'])
+        res = database.get({'url':url},atributos=['_id','url','titulo','lda'])
         articulos = res[0] if len(res) > 0 else None
         if articulos: articulos['id'] = articulos.pop('_id')
     except Exception as e:
@@ -22,7 +22,7 @@ def procesa_url_nueva(url):
         print('Obtiene modelo LDA')
         model_lda = model.get_model(texto_completo)
         print('Guarda en BD')
-        id = dao.save(
+        id = database.save(
             {'titulo': contenido_web['titulo'],
              'subtitulo': contenido_web['subtitulo'],
              'lda': model_lda,
@@ -35,7 +35,7 @@ def procesa_url_nueva(url):
 
 def elimina_articulo(id_articulo):
     try:
-        x = dao.delete(id_articulo)
+        x = database.delete(id_articulo)
     except Exception as e:
         raise Exception('(elimina_articulo)' + str(e))
     return x
@@ -53,8 +53,9 @@ def valida_topicos_no_existentes(topicos_usuario):
 
 def get_urls_by_categorias(categorias):
     try:
+        print(categorias)
         # Hago un diccionario de urls con sus topicos
-        articulos = dao.get(None, lista_variables=['_id', 'url', 'lda'])
+        articulos = database.get(None, atributos=['_id', 'url', 'lda'])
         urls_topicos = {}
         for x in articulos:
             urls_topicos[x['url']] = [t for t,v in x['lda'].items()]
@@ -83,7 +84,7 @@ def get_categorias_all_sorted(N=None,top=True):
 # Obtiene todos los topicos, en desorden
 def get_categorias_all():
     try:
-        articulos = dao.get(None, lista_variables=['_id', 'titulo', 'lda'])
+        articulos = database.get(None, atributos=['_id', 'titulo', 'lda'])
         d = {}
         for x in articulos:
             for topico, valor in x['lda'].items(): d[topico] = d[topico] + 1 if topico in d else 1
@@ -91,5 +92,15 @@ def get_categorias_all():
     return d
 
 
+
+if __name__ == '__main__2':
+    url = 'https://medium.com/@TCWstrategies/machine-learning-and-progressive-organizing-now-is-the-time-e9ce2a429b1a'
+    contenido_web = webscraping.extrae_contenido(url)
+    print(contenido_web['titulo'])
+    texto_completo = ' '.join(contenido_web.values())
+    model_lda = model.get_model(texto_completo)
+    print(', '.join(list(model_lda.keys())))
+    #print(get_categorias_all_sorted(5))
+
 if __name__ == '__main__':
-    print(get_categorias_all_sorted(5))
+    print(get_urls_by_categorias(['data']))
